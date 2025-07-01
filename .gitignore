@@ -5,3 +5,8 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+terraform.tfstate
+terraform.tfstate.backup
+.terraform/
+*.tfvars
+*.tfvars.json
