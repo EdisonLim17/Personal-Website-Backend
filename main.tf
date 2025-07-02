@@ -89,23 +89,31 @@ resource "aws_dynamodb_table" "website-dynamodb-table" {
 }
 
 resource "aws_lambda_function" "get-visitor-count-function" {
+  filename = data.archive_file.get-visitor-count-zip.output_path
   function_name = "GetWebsiteVisitorCount"
   role = aws_iam_role.lambda-exec-role.arn
-  handler = "lambda_function.lambda_handler"
+  handler = "getwebsitevisitorcount.lambda_handler"
   runtime = "python3.13"
-  filename = "${path.module}/GetWebsiteVisitorCount.zip"
-
-  publish = false
 }
 
 resource "aws_lambda_function" "update-visitor-count-function" {
+  filename = data.archive_file.update-visitor-count-zip.output_path
   function_name = "UpdateWebsiteVisitorCount"
   role = aws_iam_role.lambda-exec-role.arn
-  handler = "lambda_function.lambda_handler"
+  handler = "updatewebsitevisitorcount.lambda_handler"
   runtime = "python3.11"
-  filename = "${path.module}/UpdateWebsiteVisitorCount.zip"
+}
 
-  publish = false
+data "archive_file" "get-visitor-count-zip" {
+  type = "zip"
+  source_file = "${path.module}/lambda/getwebsitevisitorcount.py"
+  output_path = "${path.module}/lambda/GetWebsiteVisitorCount.zip"
+}
+
+data "archive_file" "update-visitor-count-zip" {
+  type = "zip"
+  source_file = "${path.module}/lambda/updatewebsitevisitorcount.py"
+  output_path = "${path.module}/lambda/UpdateWebsiteVisitorCount.zip"
 }
 
 resource "aws_iam_role" "lambda-exec-role" {
