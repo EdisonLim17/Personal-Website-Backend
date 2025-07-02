@@ -125,9 +125,32 @@ resource "aws_iam_role" "lambda-exec-role" {
   description = "Allows Lambda functions to read and write to DynamoDB."
 }
 
+resource "aws_iam_policy" "dynamodb-read-write-policy" {
+  name = "DynamoDBReadWrite"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid = "ReadWriteTable"
+        Effect = "Allow"
+        Action = [
+          "dynamodb:BatchGetItem",
+          "dynamodb:GetItem",
+          "dynamodb:Query",
+          "dynamodb:Scan",
+          "dynamodb:BatchWriteItem",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem"
+        ]
+        Resource = aws_dynamodb_table.website-dynamodb-table.arn
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role_policy_attachment" "lambda-dynamodb-policy" {
   role = aws_iam_role.lambda-exec-role.id
-  policy_arn = "arn:aws:iam::415730361496:policy/DynamoDBReadWrite"
+  policy_arn = aws_iam_policy.dynamodb-read-write-policy.arn
 }
 
 resource "aws_lambda_permission" "allow-api-gateway-get" {
