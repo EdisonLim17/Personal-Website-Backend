@@ -102,3 +102,26 @@ jobs:
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: terraform apply -auto-approve -input=false
+
+  playwright:
+    name: 'Playwright End-to-End Tests'
+    needs: terraform
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install Python Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest playwright pytest-playwright
+        playwright install
+
+    - name: Run Playwright Tests
+      run: pytest -v tests/test_api.py

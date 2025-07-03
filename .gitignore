@@ -4,6 +4,7 @@ node_modules/
 /test-results/
 /playwright-report/
 /blob-report/
+.pytest_cache/
 /playwright/.cache/
 terraform.tfstate
 terraform.tfstate.backup
