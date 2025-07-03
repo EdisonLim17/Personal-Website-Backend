@@ -29,27 +29,27 @@ data "aws_iam_policy_document" "allow-public-read" {
 
 resource "aws_cloudfront_distribution" "website-distribution" {
   origin {
-    domain_name = aws_s3_bucket.website-s3-bucket.bucket_regional_domain_name
+    domain_name              = aws_s3_bucket.website-s3-bucket.bucket_regional_domain_name
     origin_access_control_id = aws_cloudfront_origin_access_control.cloudfront-oac.id
-    origin_id = "edisonlim.ca.s3.us-east-1.amazonaws.com-mc963onjevv"
+    origin_id                = "edisonlim.ca.s3.us-east-1.amazonaws.com-mc963onjevv"
   }
 
-  tags = {  
+  tags = {
     Name = "PersonalWebsiteDistribution"
   }
 
-  enabled = true
-  is_ipv6_enabled = true
+  enabled             = true
+  is_ipv6_enabled     = true
   default_root_object = "index.html"
 
   aliases = ["edisonlim.ca"]
 
   default_cache_behavior {
-    cache_policy_id = "658327ea-f89d-4fab-a63d-7e88639e58f6"
-    allowed_methods = ["GET", "HEAD"]
-    cached_methods = ["GET", "HEAD"]
+    cache_policy_id  = "658327ea-f89d-4fab-a63d-7e88639e58f6"
+    allowed_methods  = ["GET", "HEAD"]
+    cached_methods   = ["GET", "HEAD"]
     target_origin_id = "edisonlim.ca.s3.us-east-1.amazonaws.com-mc963onjevv"
-    compress = true
+    compress         = true
 
     viewer_protocol_policy = "redirect-to-https"
   }
@@ -59,29 +59,29 @@ resource "aws_cloudfront_distribution" "website-distribution" {
   restrictions {
     geo_restriction {
       restriction_type = "none"
-      locations = []
+      locations        = []
     }
   }
 
   viewer_certificate {
-    acm_certificate_arn = "arn:aws:acm:us-east-1:415730361496:certificate/d4a9d33a-d78d-43ea-bf35-de2fe36a904d"
+    acm_certificate_arn      = "arn:aws:acm:us-east-1:415730361496:certificate/d4a9d33a-d78d-43ea-bf35-de2fe36a904d"
     minimum_protocol_version = "TLSv1.2_2021"
-    ssl_support_method = "sni-only"
+    ssl_support_method       = "sni-only"
   }
 }
 
 resource "aws_cloudfront_origin_access_control" "cloudfront-oac" {
-  name = "oac-edisonlim.ca.s3.us-east-1.amazonaws.com-mc963ubl62h"
-  description = "Created by CloudFront"
+  name                              = "oac-edisonlim.ca.s3.us-east-1.amazonaws.com-mc963ubl62h"
+  description                       = "Created by CloudFront"
   origin_access_control_origin_type = "s3"
-  signing_behavior = "always"
-  signing_protocol = "sigv4"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
 }
 
 resource "aws_dynamodb_table" "website-dynamodb-table" {
-  name = "VisitorCount"
+  name         = "VisitorCount"
   billing_mode = "PAY_PER_REQUEST"
-  hash_key = "id" # Primary key for the table
+  hash_key     = "id" # Primary key for the table
   attribute {
     name = "id"
     type = "S" # String type for the primary key
@@ -89,29 +89,29 @@ resource "aws_dynamodb_table" "website-dynamodb-table" {
 }
 
 resource "aws_lambda_function" "get-visitor-count-function" {
-  filename = data.archive_file.get-visitor-count-zip.output_path
+  filename      = data.archive_file.get-visitor-count-zip.output_path
   function_name = "GetWebsiteVisitorCount"
-  role = aws_iam_role.lambda-exec-role.arn
-  handler = "getwebsitevisitorcount.lambda_handler"
-  runtime = "python3.13"
+  role          = aws_iam_role.lambda-exec-role.arn
+  handler       = "getwebsitevisitorcount.lambda_handler"
+  runtime       = "python3.13"
 }
 
 resource "aws_lambda_function" "update-visitor-count-function" {
-  filename = data.archive_file.update-visitor-count-zip.output_path
+  filename      = data.archive_file.update-visitor-count-zip.output_path
   function_name = "UpdateWebsiteVisitorCount"
-  role = aws_iam_role.lambda-exec-role.arn
-  handler = "updatewebsitevisitorcount.lambda_handler"
-  runtime = "python3.11"
+  role          = aws_iam_role.lambda-exec-role.arn
+  handler       = "updatewebsitevisitorcount.lambda_handler"
+  runtime       = "python3.11"
 }
 
 data "archive_file" "get-visitor-count-zip" {
-  type = "zip"
+  type        = "zip"
   source_file = "${path.module}/lambda/getwebsitevisitorcount.py"
   output_path = "${path.module}/lambda/GetWebsiteVisitorCount.zip"
 }
 
 data "archive_file" "update-visitor-count-zip" {
-  type = "zip"
+  type        = "zip"
   source_file = "${path.module}/lambda/updatewebsitevisitorcount.py"
   output_path = "${path.module}/lambda/UpdateWebsiteVisitorCount.zip"
 }
@@ -139,7 +139,7 @@ resource "aws_iam_policy" "dynamodb-read-write-policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid = "ReadWriteTable"
+        Sid    = "ReadWriteTable"
         Effect = "Allow"
         Action = [
           "dynamodb:BatchGetItem",
@@ -157,86 +157,86 @@ resource "aws_iam_policy" "dynamodb-read-write-policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "lambda-dynamodb-policy" {
-  role = aws_iam_role.lambda-exec-role.id
+  role       = aws_iam_role.lambda-exec-role.id
   policy_arn = aws_iam_policy.dynamodb-read-write-policy.arn
 }
 
 resource "aws_lambda_permission" "allow-api-gateway-get" {
-  statement_id = "167c023e-204e-533b-b813-20a4411b50b6"
-  action = "lambda:InvokeFunction"
+  statement_id  = "167c023e-204e-533b-b813-20a4411b50b6"
+  action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.get-visitor-count-function.function_name
-  principal = "apigateway.amazonaws.com"
+  principal     = "apigateway.amazonaws.com"
 
   source_arn = "${aws_api_gateway_rest_api.website-to-lambda-api.execution_arn}/*/GET/websitecounterlambdaendpoint"
 }
 
 resource "aws_lambda_permission" "allow-api-gateway-post" {
-  statement_id = "8d76a1cf-b19f-5cce-b57c-3a870b8d1dfc"
-  action = "lambda:InvokeFunction"
+  statement_id  = "8d76a1cf-b19f-5cce-b57c-3a870b8d1dfc"
+  action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.update-visitor-count-function.function_name
-  principal = "apigateway.amazonaws.com"
+  principal     = "apigateway.amazonaws.com"
 
   source_arn = "${aws_api_gateway_rest_api.website-to-lambda-api.execution_arn}/*/POST/websitecounterlambdaendpoint"
-  
+
 }
 
 resource "aws_api_gateway_rest_api" "website-to-lambda-api" {
-  name = "websitecounter2"
+  name        = "websitecounter2"
   description = "API for the personal website to get and update visitor count."
 }
 
 resource "aws_api_gateway_resource" "visitor-count-resource" {
   rest_api_id = aws_api_gateway_rest_api.website-to-lambda-api.id
-  parent_id = aws_api_gateway_rest_api.website-to-lambda-api.root_resource_id
-  path_part = "websitecounterlambdaendpoint"
+  parent_id   = aws_api_gateway_rest_api.website-to-lambda-api.root_resource_id
+  path_part   = "websitecounterlambdaendpoint"
 }
 
 resource "aws_api_gateway_method" "website-to-lambda-api-GET" {
-  rest_api_id = aws_api_gateway_rest_api.website-to-lambda-api.id
-  resource_id = aws_api_gateway_resource.visitor-count-resource.id
-  http_method = "GET"
+  rest_api_id   = aws_api_gateway_rest_api.website-to-lambda-api.id
+  resource_id   = aws_api_gateway_resource.visitor-count-resource.id
+  http_method   = "GET"
   authorization = "NONE"
 }
 
 resource "aws_api_gateway_method" "website-to-lambda-api-POST" {
-  rest_api_id = aws_api_gateway_rest_api.website-to-lambda-api.id
-  resource_id = aws_api_gateway_resource.visitor-count-resource.id
-  http_method = "POST"
+  rest_api_id   = aws_api_gateway_rest_api.website-to-lambda-api.id
+  resource_id   = aws_api_gateway_resource.visitor-count-resource.id
+  http_method   = "POST"
   authorization = "NONE"
 }
 
 resource "aws_api_gateway_method" "website-to-lambda-api-OPTIONS" {
-  rest_api_id = aws_api_gateway_rest_api.website-to-lambda-api.id
-  resource_id = aws_api_gateway_resource.visitor-count-resource.id
-  http_method = "OPTIONS"
+  rest_api_id   = aws_api_gateway_rest_api.website-to-lambda-api.id
+  resource_id   = aws_api_gateway_resource.visitor-count-resource.id
+  http_method   = "OPTIONS"
   authorization = "NONE"
 }
 
 resource "aws_api_gateway_integration" "website-to-lambda-api-GET" {
-  rest_api_id = aws_api_gateway_rest_api.website-to-lambda-api.id
-  resource_id = aws_api_gateway_resource.visitor-count-resource.id
-  http_method = aws_api_gateway_method.website-to-lambda-api-GET.http_method
+  rest_api_id             = aws_api_gateway_rest_api.website-to-lambda-api.id
+  resource_id             = aws_api_gateway_resource.visitor-count-resource.id
+  http_method             = aws_api_gateway_method.website-to-lambda-api-GET.http_method
   integration_http_method = "POST"
-  type = "AWS_PROXY"
-  uri = aws_lambda_function.get-visitor-count-function.invoke_arn
-  content_handling = "CONVERT_TO_TEXT"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.get-visitor-count-function.invoke_arn
+  content_handling        = "CONVERT_TO_TEXT"
 }
 
 resource "aws_api_gateway_integration" "website-to-lambda-api-POST" {
-  rest_api_id = aws_api_gateway_rest_api.website-to-lambda-api.id
-  resource_id = aws_api_gateway_resource.visitor-count-resource.id
-  http_method = aws_api_gateway_method.website-to-lambda-api-POST.http_method
+  rest_api_id             = aws_api_gateway_rest_api.website-to-lambda-api.id
+  resource_id             = aws_api_gateway_resource.visitor-count-resource.id
+  http_method             = aws_api_gateway_method.website-to-lambda-api-POST.http_method
   integration_http_method = "POST"
-  type = "AWS_PROXY"
-  uri = aws_lambda_function.update-visitor-count-function.invoke_arn
-  content_handling = "CONVERT_TO_TEXT"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.update-visitor-count-function.invoke_arn
+  content_handling        = "CONVERT_TO_TEXT"
 }
 
 resource "aws_api_gateway_integration" "website-to-lambda-api-OPTIONS" {
   rest_api_id = aws_api_gateway_rest_api.website-to-lambda-api.id
   resource_id = aws_api_gateway_resource.visitor-count-resource.id
   http_method = aws_api_gateway_method.website-to-lambda-api-OPTIONS.http_method
-  type = "MOCK"
+  type        = "MOCK"
   request_templates = {
     "application/json" = "{\"statusCode\": 200}"
   }
@@ -274,7 +274,7 @@ resource "aws_api_gateway_integration_response" "website-to-lambda-api-OPTIONS" 
 
 resource "aws_api_gateway_deployment" "website-to-lambda-api-deployment" {
   rest_api_id = aws_api_gateway_rest_api.website-to-lambda-api.id
-  description  = "prod"
+  description = "prod"
 
   depends_on = [
     aws_api_gateway_method.website-to-lambda-api-GET,
@@ -287,7 +287,7 @@ resource "aws_api_gateway_deployment" "website-to-lambda-api-deployment" {
 }
 
 resource "aws_api_gateway_stage" "prod" {
-  rest_api_id = aws_api_gateway_rest_api.website-to-lambda-api.id
+  rest_api_id   = aws_api_gateway_rest_api.website-to-lambda-api.id
   deployment_id = aws_api_gateway_deployment.website-to-lambda-api-deployment.id
-  stage_name = "prod"
+  stage_name    = "prod"
 }

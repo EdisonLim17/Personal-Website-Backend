@@ -1,10 +1,10 @@
-terraform { 
-  cloud { 
-    
-    organization = "EdisonLim_PersonalOrg" 
+terraform {
+  cloud {
 
-    workspaces { 
-      name = "PersonalWebsiteBackendGitHubActions" 
-    } 
-  } 
+    organization = "EdisonLim_PersonalOrg"
+
+    workspaces {
+      name = "PersonalWebsiteBackendGitHubActions"
+    }
+  }
 }
