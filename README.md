@@ -14,9 +14,9 @@ This repository contains the infrastructure-as-code (IaC) and backend logic for 
 
 ## 🚀 Features
 
-- Serverless visitor counter updated using AWS Lambda, which is invoked through a RESTful API endpoint exposed via API Gateway
+- Serverless visitor counter updated using an AWS Lambda function invoked through a RESTful API endpoint via API Gateway
 - Secure infrastructure provisioned via Terraform
-- Playwright tests ensures endpoint responds correctly and counter visitor stored in DynamoDB is updated accurately
+- Playwright tests ensures endpoint responds correctly and counter stored in DynamoDB is updated accurately
 - CI/CD pipeline auto-deploys changes to AWS on push to `main` if all tests pass
 
 ---
