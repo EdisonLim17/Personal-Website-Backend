@@ -8,7 +8,7 @@ This repository contains the infrastructure-as-code (IaC) and backend logic for 
 ---
 
 ## Architecture
-![Image of architecture](/src/assets/Personal-Website-Backend-AWS-Architecture.jpeg)
+![Image of architecture](/Personal-Website-Backend-AWS-Architecture.jpeg)
 
 ---
 
