@@ -2,6 +2,8 @@
 
 This repository contains the infrastructure-as-code (IaC) and backend logic for my personal portfolio website. It uses **Terraform** to provision all AWS resources and deploys an **AWS Lambda** function that tracks visitor count using **DynamoDB**, invoked via the **API Gateway**. The frontend repo for this website can be found [here](https://github.com/EdisonLim17/Personal-Website-Frontend).
 
+---
+
 ### 🌐 Live Site
 [https://edisonlim.ca](https://edisonlim.ca)
 
