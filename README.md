@@ -7,7 +7,7 @@ This repository contains the infrastructure-as-code (IaC) and backend logic for 
 
 ---
 
-## Architecture
+## ☁️ Architecture
 ![Image of architecture](/Personal-Website-Backend-AWS-Architecture.jpeg)
 
 ---
@@ -32,7 +32,7 @@ This repository contains the infrastructure-as-code (IaC) and backend logic for 
 
 ---
 
-## 🔧 CI/CD Workflow
+## 🔄 CI/CD Workflow
 
 Whenever changes are pushed to the `main` branch:
 1. GitHub Actions deploys the backend infrastructure to AWS using Terraform
